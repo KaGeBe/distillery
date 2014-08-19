@@ -1,4 +1,6 @@
 
+import strategy
+
 class AbstractStrategy:
     
     def __init__(self,color):
