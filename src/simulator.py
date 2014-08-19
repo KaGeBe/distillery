@@ -30,20 +30,22 @@ class Simulator:
         self.last_move = None
 
     def place(self, x, y, color):
-        place = self.field[y][x]
-        assert len(place) == 0
+        place = self.field[x][y]
+        if not len(place) == 0:
+            raise GameLogicError("Not an empty field.")
+
         place.append(color)
         self.last_move = (x, y, color)
 
     def move(self, x0, y0, x1, y1, count):
         self.check_undo(x0, y0, x1, y1, count)
 
-        place = self.field[y0][x0]
+        place = self.field[x0][y0]
         if len(place) < count:
             raise MoveError(x0, y0, x1, y1, count,
                             "Not enough tower pieces at origin.")
 
-        target_place = self.field[y1][x1]
+        target_place = self.field[x1][y1]
         if len(target_place) == 0:
             raise MoveError(x0, y0, x1, y1, count,
                             "Target place does not have a tower.")
@@ -51,13 +53,13 @@ class Simulator:
         self.check_sight(x0, y0, x1, y1, count)
 
         pieces = place[-count:]
-        self.field[y1][x1].extend(pieces)
+        self.field[x1][y1].extend(pieces)
         del place[-count:]
         self.check_win(x1, y1)
         self.last_move = (x0, y0, x1, y1, count)
 
     def check_win(self, x, y):
-        place = self.field[y][x]
+        place = self.field[x][y]
         if len(place) > 4:
             print(str(place[-1]) + " has won.")
 
@@ -67,7 +69,7 @@ class Simulator:
 
     def check_sight(self, x0, y0, x1, y1, count):
         # TODO check nothing in between
-        target_height = len(self.field[y1][x1])
+        target_height = len(self.field[x1][y1])
         dist_x = abs(x1 - x0)
         dist_y = abs(y1 - y0)
         if dist_x == 0 and dist_y == 0:
