@@ -11,7 +11,7 @@ class Simple_Strategy(Strategy):
         for i in range(5):
             for j in range(5):
                 if len(simulator.field[i][j]) == 0:
-                    simulator.place(j,i,self.color)
+                    simulator.place(i,j,self.color)
                     return
         
         assert simulator.last_move != (0,0,0,1,1)
