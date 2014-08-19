@@ -19,7 +19,7 @@ class MoveError(GameLogicError):
         self.value = value
 
     def __str__(self):
-        return "Cannot move {} pieces from {} to {}: {}" \
+        return "Cannot move {} piece(s) from {} to {}: {}" \
                .format(self.count, self.src, self.tgt, self.value)
 
 
@@ -33,26 +33,37 @@ class Simulator:
         place = self.field[y][x]
         assert len(place) == 0
         place.append(color)
+        self.last_move = (x, y, color)
 
     def move(self, x0, y0, x1, y1, count):
+        self.check_undo(x0, y0, x1, y1, count)
+
         place = self.field[y0][x0]
         if len(place) < count:
             raise MoveError(x0, y0, x1, y1, count,
                             "Not enough tower pieces at origin.")
-        stack = place[-count:]
+
         target_place = self.field[y1][x1]
         if len(target_place) == 0:
             raise MoveError(x0, y0, x1, y1, count,
                             "Target place does not have a tower.")
+
         self.check_sight(x0, y0, x1, y1, count)
-        self.field[y1][x1].extend(stack)
+
+        pieces = place[-count:]
+        self.field[y1][x1].extend(pieces)
         del place[-count:]
         self.check_win(x1, y1)
+        self.last_move = (x0, y0, x1, y1, count)
 
     def check_win(self, x, y):
         place = self.field[y][x]
         if len(place) > 4:
             print(str(place[-1]) + " has won.")
+
+    def check_undo(self, x0, y0, x1, y1, count):
+        if self.last_move == (x1, y1, x0, y0, count):
+            raise MoveError(x0, y0, x1, y1, count, "Would undo the last move.")
 
     def check_sight(self, x0, y0, x1, y1, count):
         # TODO check nothing in between
