@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
 
+def compare(a, b):
+    return (a > b) - (a < b)
+
+
 class GameLogicError(Exception):
 
     def __init__(self, value):
@@ -72,6 +76,8 @@ class Simulator:
         target_height = len(self.field[x1][y1])
         dist_x = abs(x1 - x0)
         dist_y = abs(y1 - y0)
+        dir_x = compare(x1, x0)
+        dir_y = compare(y1, y0)
         if dist_x == 0 and dist_y == 0:
             raise MoveError(x0, y0, x1, y1, count, "Origin == Target")
         elif dist_x == dist_y or dist_x == 0 or dist_y == 0:
@@ -80,6 +86,15 @@ class Simulator:
                 raise MoveError(x0, y0, x1, y1, count,
                                 "Distance {} too far from target tower of"
                                 " height {}.".format(dist, target_height))
+            for i in range(1, dist):
+                x = x0 + (dir_x * i)
+                y = y0 + (dir_y * i)
+                place = self.field[x][y]
+                if len(place) > 0:
+                    raise MoveError(x0, y0, x1, y1, count,
+                                    "Blocking tower in between at ({}, {})"
+                                    .format(x, y))
+
         else:
             raise MoveError(x0, y0, x1, y1, count, "Not in a valid direction.")
 
@@ -90,20 +105,12 @@ class Simulator:
 
 if __name__ == "__main__":
     sim = Simulator()
-    print(sim)
-    sim.place(0, 0, "R")
-    print(sim)
+    sim.place(3, 3, "R")
     sim.place(2, 2, "R")
+    sim.move(3, 3, 2, 2, 1)
+    sim.place(4, 4, "R")
     print(sim)
-    sim.place(2, 1, "R")
+    sim.place(3, 3, "W")
     print(sim)
-    sim.move(2, 1, 2, 2, 1)
+    sim.move(4, 4, 2, 2, 1)
     print(sim)
-    sim.place(3, 2, "W")
-    print(sim)
-    sim.move(2, 2, 3, 2, 1)
-    print(sim)
-    sim.place(3, 1, "R")
-    for i in range(4):
-        sim.place(3, 0, "R")
-        sim.move(3, 0, 3, 1, 1)
