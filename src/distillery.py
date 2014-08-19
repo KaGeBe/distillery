@@ -2,13 +2,14 @@
 
 import strategy
 from trivialStrategy import *
+from simple_strategy import *
 from simulator import *
 
 if __name__ == "__main__":
     print ("Purifying liquids...")
     sim = Simulator()
-    trivial_white = Strategy("white")
-    trivial_red = Strategy("red")
+    trivial_white = Trivial_Strategy("white")
+    trivial_red = Simple_Strategy("red")
     turn = "white"
     turn_no = 1
     while (turn_no<1000):

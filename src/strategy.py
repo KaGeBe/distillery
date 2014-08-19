@@ -1,7 +1,7 @@
 
 import strategy
 
-class AbstractStrategy:
+class Strategy:
     
     def __init__(self,color):
         self.color = color
