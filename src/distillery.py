@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import strategy
-from trivial_strategy import *
+from  import *
 from simple_strategy import *
 from simulator import *
 
