@@ -12,9 +12,8 @@ class Trivial_Strategy(Strategy):
             for j in range(5):
                 if len(simulator.field[i][j]) == 0:
                     simulator.place(i,j,self.color)
-                    return
-        
+                    return False
+
         assert simulator.last_move != (0,0,0,1,1)
-        simulator.move(0,0,0,1,1)
-        return
-        
+        return simulator.move(0,0,0,1,1)
+
