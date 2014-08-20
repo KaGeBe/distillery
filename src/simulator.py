@@ -34,6 +34,7 @@ class Simulator:
         self.last_move = None
 
     def place(self, x, y, color):
+        print("Placing {} on {}.".format(color, (x, y)))
         place = self.field[x][y]
         if not len(place) == 0:
             raise GameLogicError("Not an empty field.")
@@ -42,6 +43,8 @@ class Simulator:
         self.last_move = (x, y, color)
 
     def move(self, x0, y0, x1, y1, count):
+        print("Moving {} piece(s) from {} to {}."
+              .format(count, (x0, y0), (x1, y1)))
         self.check_undo(x0, y0, x1, y1, count)
 
         place = self.field[x0][y0]
@@ -59,33 +62,34 @@ class Simulator:
         pieces = place[-count:]
         self.field[x1][y1].extend(pieces)
         del place[-count:]
-        self.check_win(x1, y1)
         self.last_move = (x0, y0, x1, y1, count)
+        return self.check_win(x1, y1)
 
     def check_win(self, x, y):
         place = self.field[x][y]
         if len(place) > 4:
-            print(str(place[-1]) + " has won.")
+            return (place[-1], x, y)
+        return False
 
     def check_undo(self, x0, y0, x1, y1, count):
         if self.last_move == (x1, y1, x0, y0, count):
             raise MoveError(x0, y0, x1, y1, count, "Would undo the last move.")
 
     def check_sight(self, x0, y0, x1, y1, count):
-        # TODO check nothing in between
         target_height = len(self.field[x1][y1])
         dist_x = abs(x1 - x0)
         dist_y = abs(y1 - y0)
         dir_x = compare(x1, x0)
         dir_y = compare(y1, y0)
         if dist_x == 0 and dist_y == 0:
-            raise MoveError(x0, y0, x1, y1, count, "Origin == Target")
+            raise MoveError(x0, y0, x1, y1, count, "Origin is equal target")
         elif dist_x == dist_y or dist_x == 0 or dist_y == 0:
             dist = max([dist_x, dist_y])
             if dist > target_height:
                 raise MoveError(x0, y0, x1, y1, count,
                                 "Distance {} too far from target tower of"
                                 " height {}.".format(dist, target_height))
+            # now checking that no tower between both fields
             for i in range(1, dist):
                 x = x0 + (dir_x * i)
                 y = y0 + (dir_y * i)
