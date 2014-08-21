@@ -1,19 +1,20 @@
 
-from strategy import *
-import simulator
+from strategy import Strategy
+
 
 class Trivial_Strategy(Strategy):
 
-    def __init__(self,color):
-        self.color = color
+    def __init__(self, color):
+        Strategy.__init__(self, color)
 
-    def next_move(self,simulator):
+    def next_action(self, simulator):
         for i in range(5):
             for j in range(5):
                 if len(simulator.field[i][j]) == 0:
-                    simulator.place(i,j,self.color)
-                    return False
+                    return (i, j)
 
-        assert simulator.last_move != (0,0,0,1,1)
-        return simulator.move(0,0,0,1,1)
+        assert simulator.last_action != (0, 0, 0, 1, 1)
+        return (0, 0, 0, 1, 1)
 
+    def __str__(self):
+        return "Trivial_Strategy({})".format(self.color)

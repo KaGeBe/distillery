@@ -29,9 +29,31 @@ class MoveError(GameLogicError):
 
 class Simulator:
 
-    def __init__(self):
+    def __init__(self, first_player, second_player):
         self.field = [[[] for i in range(5)] for j in range(5)]
-        self.last_move = None
+        self.last_action = None
+        self.players = [first_player, second_player]
+
+    def run(self, max_turns=None):
+        turn = 0
+        while max_turns is None or turn < max_turns:
+            current_player = self.players[turn % 2]
+            turn += 1
+            action = current_player.next_action(self)
+            print("Turn {} Player {}".format(turn, current_player))
+            result = False
+            if len(action) == 2:
+                x, y = action
+                result = self.place(x, y, current_player.color)
+            else:
+                x0, y0, x1, y1, count = action
+                result = self.move(x0, y0, x1, y1, count)
+            self.last_action = action
+            print(self)
+            if result:
+                (win_color, x, y) = result
+                print("Player {} has won on {}".format(win_color, (x, y)))
+                return
 
     def place(self, x, y, color):
         print("Placing {} on {}.".format(color, (x, y)))
@@ -40,7 +62,7 @@ class Simulator:
             raise GameLogicError("Not an empty field.")
 
         place.append(color)
-        self.last_move = (x, y, color)
+        return False
 
     def move(self, x0, y0, x1, y1, count):
         print("Moving {} piece(s) from {} to {}."
@@ -62,7 +84,6 @@ class Simulator:
         pieces = place[-count:]
         self.field[x1][y1].extend(pieces)
         del place[-count:]
-        self.last_move = (x0, y0, x1, y1, count)
         return self.check_win(x1, y1)
 
     def check_win(self, x, y):
@@ -72,7 +93,7 @@ class Simulator:
         return False
 
     def check_undo(self, x0, y0, x1, y1, count):
-        if self.last_move == (x1, y1, x0, y0, count):
+        if self.last_action == (x1, y1, x0, y0, count):
             raise MoveError(x0, y0, x1, y1, count, "Would undo the last move.")
 
     def check_sight(self, x0, y0, x1, y1, count):
