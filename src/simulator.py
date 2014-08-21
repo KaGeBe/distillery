@@ -71,9 +71,11 @@ class Simulator:
             if len(action) == 2:
                 x, y = action
                 result = self.place(x, y, current_player.color)
-            else:
+            elif len(action) == 5:
                 x0, y0, x1, y1, count = action
                 result = self.move(x0, y0, x1, y1, count)
+            else:
+                raise GameLogicError("Player action {} invalid".format(action))
             self.last_action = action
             print(self)
             if result:
@@ -81,17 +83,23 @@ class Simulator:
                 print("Player {} has won on {}".format(win_color, (x, y)))
                 return
 
+    def get_tower(self, x, y):
+        return self.field[x][y]
+
+    def get_height(self, x, y):
+        return len(self.get_tower(x, y))
+
     def place(self, x, y, color):
         print("Placing {} on {}.".format(color, (x, y)))
         place = self.field[x][y]
-        if not self.can_place(x, y):
+        if self.has_tower(x, y):
             raise GameLogicError("Not an empty field.")
 
         place.append(color)
         return False
 
-    def can_place(self, x, y):
-        return len(self.field[x][y]) == 0
+    def has_tower(self, x, y):
+        return self.get_height(x, y) > 0
 
     def move(self, x0, y0, x1, y1, count):
         print("Moving {} piece(s) from {} to {}."
