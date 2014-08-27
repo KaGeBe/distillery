@@ -59,18 +59,20 @@ class Simulator:
         self.field = [[[] for i in range(5)] for j in range(5)]
         self.last_action = None
         self.players = [first_player, second_player]
+        self.colors = ['W', 'R']
 
     def run(self, max_turns=None):
         turn = 0
         while max_turns is None or turn < max_turns:
             current_player = self.players[turn % 2]
+            current_color = self.colors[turn % 2]
             turn += 1
             action = current_player.next_action(self)
             print("Turn {} Player {}".format(turn, current_player))
             result = False
             if len(action) == 2:
                 x, y = action
-                result = self.place(x, y, current_player.color)
+                result = self.place(x, y, current_color)
             elif len(action) == 5:
                 x0, y0, x1, y1, count = action
                 result = self.move(x0, y0, x1, y1, count)

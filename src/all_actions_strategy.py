@@ -38,6 +38,8 @@ class AllActionsStrategy(Strategy):
                     places.add((x, y))
                 else:
                     self.add_moves(simulator, x, y, moves)
+        print(places)
+        print(moves)
         return (places, moves)
 
     def next_action(self, simulator):
